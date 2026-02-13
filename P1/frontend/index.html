@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediLogic | Sistema Experto Médico</title>
+
+    <!-- Tailwind -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="min-h-screen flex flex-col bg-slate-100 text-slate-800">
+    <!-- CONTENEDOR GLOBAL -->
+    <div class="max-w-7xl mx-auto px-6 flex flex-col flex-1">
+        <!-- HEADER -->
+        <header class="py-6 border-b border-gray-200">
+            <div class="flex flex-col items-center text-center">
+                <h1 class="text-6xl font-extrabold tracking-tight">
+                    Medi<span class="text-blue-600">Logic</span>
+                </h1>
+                <p class="text-gray-500 mt-2 text-lg">
+                    Sistema Experto de Diagnóstico Médico basado en Lógica Prolog
+                </p>
+            </div>
+
+            <!-- NAV -->
+            <nav class="flex flex-col sm:flex-row items-center justify-center gap-6 mt-8">
+
+                <!-- PACIENTE -->
+                <a href="patient.html"
+                   class="flex items-center gap-3 bg-blue-600 text-white px-6 py-3 rounded-xl shadow-md hover:bg-blue-700 transition-all hover:scale-105">
+
+                    <span class="font-semibold">Módulo Paciente</span>
+                </a>
+
+                <!-- ADMIN -->
+                <a href="admin.html"
+                   class="flex items-center gap-3 bg-indigo-600 text-white px-6 py-3 rounded-xl shadow-md hover:bg-indigo-700 transition-all hover:scale-105">
+
+                    <span class="font-semibold">Módulo Administrador</span>
+                </a>
+
+            </nav>
+        </header>
+
+        <!-- MAIN -->
+        <main class="flex flex-col lg:flex-row items-center justify-between gap-12 py-16 flex-1">
+            <!-- TEXTO -->
+            <section class="lg:w-1/2 space-y-6">
+
+                <h2 class="text-4xl font-bold leading-tight">
+                    Diagnóstico preliminar inteligente
+                </h2>
+
+                <p class="text-lg text-gray-600 text-justify">
+                    MediLogic es un sistema experto desarrollado en Python y Prolog que
+                    permite analizar síntomas, enfermedades crónicas y alergias para
+                    generar posibles diagnósticos con un porcentaje de afinidad.
+                </p>
+
+                <p class="text-lg text-gray-600 text-justify">
+                    Utilizando reglas de inferencia lógica implementadas en un archivo
+                    <span class="font-semibold">.pl</span>, el sistema evalúa relaciones
+                    clínicas, detecta contraindicaciones y sugiere tratamientos seguros,
+                    mostrando además un nivel estimado de urgencia médica.
+                </p>
+
+                <div class="flex gap-4 mt-6">
+                    <a href="patient.html"
+                       class="bg-blue-600 text-white px-5 py-3 rounded-lg shadow hover:bg-blue-700 transition">
+                        Iniciar diagnóstico
+                    </a>
+                </div>
+
+            </section>
+
+            <!-- VIDEO -->
+            <aside class="lg:w-1/2">
+                <video class="w-full max-h-[450px] object-cover rounded-xl shadow-lg"
+                       src="./assets/video.mp4"
+                       autoplay muted loop>
+                </video>
+            </aside>
+
+        </main>
+
+        <!-- COMO FUNCIONA -->
+        <section class="py-16 border-t border-gray-200">
+            <h3 class="text-3xl font-bold text-center mb-12">
+                ¿Cómo funciona?
+            </h3>
+            <div class="grid md:grid-cols-3 gap-8">
+
+                <!-- Paso 1 -->
+                <div class="bg-white p-8 rounded-xl shadow-md hover:shadow-lg transition">
+                    <h4 class="text-xl font-semibold mb-3 text-blue-600">
+                        1. Ingreso de datos
+                    </h4>
+                    <p class="text-gray-600">
+                        El paciente selecciona síntomas, nivel de severidad,
+                        alergias y enfermedades crónicas mediante formularios interactivos.
+                    </p>
+                </div>
+
+                <!-- Paso 2 -->
+                <div class="bg-white p-8 rounded-xl shadow-md hover:shadow-lg transition">
+                    <h4 class="text-xl font-semibold mb-3 text-indigo-600">
+                        2. Inferencia lógica
+                    </h4>
+                    <p class="text-gray-600">
+                        El motor Prolog analiza las reglas definidas en la base
+                        de conocimiento y calcula el porcentaje de afinidad
+                        entre síntomas y enfermedades.
+                    </p>
+                </div>
+
+                <!-- Paso 3 -->
+                <div class="bg-white p-8 rounded-xl shadow-md hover:shadow-lg transition">
+                    <h4 class="text-xl font-semibold mb-3 text-green-600">
+                        3. Resultado inteligente
+                    </h4>
+                    <p class="text-gray-600">
+                        El sistema genera un informe con diagnósticos ordenados,
+                        tratamiento sugerido seguro y nivel estimado de urgencia.
+                    </p>
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-gray-200 py-6 text-center">
+        <p class="text-sm text-gray-500">
+            Todos los derechos reservados &copy; 2026 | MediLogic
+        </p>
+    </footer>
+</body>
+</html>
