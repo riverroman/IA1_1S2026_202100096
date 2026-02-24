@@ -37,6 +37,7 @@ function Login() {
       className="min-h-screen flex items-center justify-center"
     >
       <motion.form
+        onSubmit={handleLogin}
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
