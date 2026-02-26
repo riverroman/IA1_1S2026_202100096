@@ -1,1 +1,4 @@
 Flask
+pyswip
+python-dotenv
+flask-cors
