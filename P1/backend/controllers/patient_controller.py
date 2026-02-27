@@ -12,3 +12,21 @@ def diagnostico():
     resultado = diagnostic_service.obtener_diagnostico(sintomas)
     
     return jsonify(resultado)
+
+@patient_bp.route("/existe/<nombre>", methods=["GET"])
+def existe(nombre):
+    resultado = diagnostic_service.existe_enfermedad(nombre)
+    return jsonify(resultado)
+
+@patient_bp.route("/sintomas/<nombre>", methods=["GET"])
+def sintomas(nombre):
+    resultado = diagnostic_service.obtener_sintomas(nombre)
+    return jsonify(resultado)
+
+@patient_bp.route("/afinidad", methods=["POST"])
+def afinidad():
+    data = request.get_json()
+    nombre = data["enfermedad"]
+    sintomas = data["sintomas"]
+    resultado = diagnostic_service.calcular_afinidad(nombre, sintomas)
+    return jsonify(resultado)
