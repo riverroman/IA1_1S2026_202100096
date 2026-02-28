@@ -61,7 +61,6 @@ diagnostico(ListaSintomas, E, P, Urgencia) :-
     afinidad(E, ListaSintomas, P),
     P >= 30,
     nivel_urgencia(E, P, Urgencia).
-
 enfermedad(gripe).
 descripcion(gripe,'Infección viral aguda del sistema respiratorio').
 sintoma(gripe,fiebre).

@@ -1,4 +1,3 @@
-Flask
 pyswip
+pyautogui
 python-dotenv
-flask-cors
