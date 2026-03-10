@@ -219,9 +219,9 @@ class HomeView(tk.Frame):
         features_frame.pack(anchor="w")
 
         features = [
-            ("⚡", "Diagnóstico inmediato"),
-            ("🔒", "Sin registro requerido"),
-            ("📋", "Gestión RPA integrada"),
+            ("", "Diagnóstico inmediato"),
+            ("", "Sin registro requerido"),
+            ("", "Gestión RPA integrada"),
         ]
 
         for icon, label in features:

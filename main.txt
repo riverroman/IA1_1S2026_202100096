@@ -5,7 +5,8 @@ Inicio:
     explicando que se trata de una herramienta de apoyo diagnóstico preliminar que no
     sustituye la consulta médica profesional. Desde esta pantalla, el usuario podrá elegir entre
     acceder al módulo de diagnóstico para pacientes o al módulo administrativo para personal
-    médico, este último protegido mediante credenciales.
+    médico, este último protegido mediante credenciales. 
+    [x listo]
 
 Pacientes:
 
