@@ -1,0 +1,79 @@
+Inicio:
+
+    -> Al ingresar al sistema, los usuarios encontrarán una pantalla principal accesible sin
+    autenticación. En ella se mostrará una descripción general del sistema y su funcionalidad,
+    explicando que se trata de una herramienta de apoyo diagnóstico preliminar que no
+    sustituye la consulta médica profesional. Desde esta pantalla, el usuario podrá elegir entre
+    acceder al módulo de diagnóstico para pacientes o al módulo administrativo para personal
+    médico, este último protegido mediante credenciales.
+
+Pacientes:
+
+    -> Pacientes
+    El módulo destinado a los usuarios pacientes permitirá ingresar información clínica básica a
+    través de formularios interactivos. El sistema debe permitir seleccionar síntomas presentes
+    a través de checkboxes, así como registrar alergias a medicamentos y enfermedades
+    crónicas preexistentes como diabetes, hipertensión, enfermedades autoinmunes, entre
+    otras.
+    Además, para mejorar la precisión del análisis, el sistema deberá permitir que el usuario
+    indique el nivel de severidad de cada síntoma (leve, moderado, severo), lo cual debe influir
+    en el cálculo de la afinidad con las enfermedades registradas.
+    Una vez completado el ingreso de datos, el usuario podrá solicitar un análisis. El sistema,
+    utilizando la base de conocimiento en prolog, realizará un proceso de inferencia lógica para
+    determinar posibles enfermedades asociadas a los síntomas proporcionados. Estas
+    enfermedades deberán ordenarse por porcentaje de coincidencia, expresado como nivel de
+    afinidad entre el perfil del paciente y las características clínicas de cada enfermedad.
+    Además del diagnóstico, el sistema debe sugerir medicamentos adecuados para tratar cada
+    una de las enfermedades listadas, siempre y cuando no estén contraindicados por las
+    alergias o condiciones crónicas indicadas. En caso de conflictos entre tratamientos posibles
+    y enfermedades coexistentes, el sistema deberá identificar estas incompatibliidades y
+    excluir opciones que puedan representar un riesgo para el paciente, sugiriendo otro posible
+    medicamento con el mismo fin, pero sin repercusiones para su estado de salud general.
+    Finalmente, el sistema deberá emitir una recomendación de acción para el usuario,
+    indicando el nivel de urgencia con frases como: “Consulta médica inmediata sugerida”,
+    “Posible automanejo” u “Observación recomendada”.
+    El informe que se genere debe incluir:
+    ● Una lista de enfermedades sugeridas, ordenadas de mayor a menor probabilidad.
+    ● El porcentaje de afinidad correspondiente a cada diagnóstico.
+    ● El medicamento más seguro y efectivo propuesto, evitando riesgos por alergias o
+    interacciones negativas.
+    ● Una explicación detallada que indique qué reglas Prolog se activaron para llegar a
+    las conclusiones presentadas.
+    ● Un nivel de urgencia estimado para cada diagnóstico, con base en los síntomas y su
+    severidad.
+    ● Visualización clara de los resultados mediante tablas, secciones y gráficos
+    explicativos como barras de afinidad o alertas de advertencia.
+    Adicionalmente, el sistema deberá mantener un historial local temporal de diagnósticos
+    durante la sesión activa en el navegador, permitiendo que el paciente revise análisis
+    anteriores mientras navega.
+    También deberá ofrecer la opción de descargar el informe en formato PDF, incluyendo la
+    fecha, un resumen del diagnóstico, las advertencias importantes, los medicamentos
+    sugeridos, las reglas activadas y el sello visual del sistema.
+
+Administrador:
+
+    -> El módulo administrativo estará protegido por autenticación y será accesible únicamente
+    para usuarios con credenciales válidas. Este módulo ofrecerá un panel de control completo
+    que permita gestionar la base de conocimientos del sistema en tiempo real, mediante
+    formularios o interfaces estructuradas que no requieran editar manualmente el archivo .pl.
+    Desde este panel, el administrador podrá realizar las siguientes acciones:
+    ● Crear, editar y eliminar enfermedades registradas en el sistema, incluyendo su
+    nombre, descripción, síntomas asociados y medicamentos contraindicados.
+    ● Registrar nuevos síntomas y asociarlos a enfermedades específicas mediante
+    criterios de compatibilidad.
+    ● Administrar medicamentos disponibles, indicando qué enfermedades pueden tratar y
+    qué contraindicaciones presentan.
+    ● Definir relaciones de contraindicación entre medicamentos, enfermedades crónicas y
+    alergias.
+    ● Clasificar enfermedades por sistema del cuerpo (respiratorio, digestivo, endocrino,
+    etc.) o por tipo (viral, crónico, inmunológico), para facilitar su administración y
+    consulta.
+    ● Visualizar y exportar el archivo .pl actual con toda la base lógica del sistema.
+    ● Cargar un nuevo archivo .pl para actualizar el sistema sin necesidad de reprogramar
+    la interfaz.
+    Todos los cambios realizados mediante la interfaz administrativa deben reflejarse
+    automáticamente en el archivo Prolog, asegurando así la persistencia, actualización y
+    validez de las reglas y hechos registrados. Esta integración entre el frontend del sistema y la
+    lógica
+    declarativa debe garantizar que el motor de inferencia pueda utilizar los datos actualizados
+    de forma inmediata.
