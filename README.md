@@ -1,2 +1,2 @@
-# -IA1_1S2026_202100096
+# INTELIGENCIA ARTIFICIAL PRIMER SEMESTRE 2026
 Repositorio oficial del curso Inteligencia Artificial

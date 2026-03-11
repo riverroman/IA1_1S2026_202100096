@@ -39,7 +39,7 @@ class DiagnosisView(tk.Frame):
         self._total_lbl=tk.Label(sb,text="",font=FONTS["body_sm"],bg=COLORS["bg_card"],fg=COLORS["text_secondary"])
         self._total_lbl.pack(pady=(8,0))
         tk.Frame(sb,bg=COLORS["bg_card"]).pack(expand=True)
-        _btn(sb,"← Nueva Consulta",lambda:self.controller.show_frame(__import__("ui.patient_view").patient_view.PatientView),secondary=True).pack(pady=(0,8),padx=20,fill="x")
+        _btn(sb,"Nueva Consulta",lambda:self.controller.show_frame(__import__("ui.patient_view").patient_view.PatientView),secondary=True).pack(pady=(0,8),padx=20,fill="x")
         _btn(sb,"Exportar PDF",self._exportar_pdf,secondary=True).pack(pady=(0,8),padx=20,fill="x")
         _btn(sb,"Ver Historial",self._ver_historial,secondary=True).pack(pady=(0,24),padx=20,fill="x")
 
@@ -138,7 +138,7 @@ class DiagnosisView(tk.Frame):
         todos=r.get("todos_meds",[])
         mf=tk.Frame(c,bg=COLORS["bg_card"])
         mf.pack(fill="x",pady=(0,14))
-        tk.Label(mf,text="💊  Medicamento sugerido:",font=("Helvetica",10,"bold"),bg=COLORS["bg_card"],fg=COLORS["text_muted"]).pack(anchor="w")
+        tk.Label(mf,text="Medicamento sugerido:",font=("Helvetica",10,"bold"),bg=COLORS["bg_card"],fg=COLORS["text_muted"]).pack(anchor="w")
         md=str(med).replace("_"," ").title() if med!="ninguno" else "⚠ Ninguno disponible (revisar alergias)"
         mc=COLORS["accent"] if med!="ninguno" else COLORS["danger"]
         tk.Label(mf,text=f"  {md}",font=("Helvetica",11,"bold"),bg=COLORS["bg_card"],fg=mc).pack(anchor="w",pady=(4,0))

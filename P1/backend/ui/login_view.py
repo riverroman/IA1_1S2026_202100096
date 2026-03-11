@@ -3,7 +3,6 @@ from tkinter import messagebox
 from ui.admin_view import AdminView
 from ui.theme import COLORS, FONTS, PAD
 
-
 def styled_entry(parent, **kwargs):
     e = tk.Entry(
         parent,
@@ -137,7 +136,7 @@ class LoginView(tk.Frame):
         self.user.bind("<Return>", lambda e: self.password.focus())
 
     def login(self):
-        if self.user.get() == "admin" and self.password.get() == "admin123":
+        if self.user.get() == "riverroman1415@gmail.com" and self.password.get() == "admin":
             self.controller.show_frame(AdminView)
         else:
             messagebox.showerror("Acceso Denegado", "Credenciales incorrectas.\nVerifique usuario y contraseña.")

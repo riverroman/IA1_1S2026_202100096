@@ -1,0 +1,19 @@
+============================================================
+  INFORME DE CARGA RPA — MediLogic
+============================================================
+  Fecha y hora   : 2026-03-11T11:59:14.568209
+  Archivo origen : /Users/river/Desktop/IA1_1S2026_202100096/P1/backend/rpa/../ArchivoRPA.txt
+  Total en TXT   : 3
+  Cargadas OK    : 3
+  Con errores    : 0
+============================================================
+
+ENFERMEDADES CARGADAS EXITOSAMENTE:
+----------------------------------------
+  [OK]    neumonia_bacteriana
+  [OK]    hepatitis_a
+  [OK]    hipertiroidismo
+
+============================================================
+  Generado por el Robot RPA de MediLogic
+============================================================

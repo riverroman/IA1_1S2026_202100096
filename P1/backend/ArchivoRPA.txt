@@ -1,0 +1,4 @@
+NOMBRE;DESCRIPCION;SINTOMA_ASOCIADO;MEDICAMENTO_CONTRAINDICADO;CLASIFICACION
+neumonia_bacteriana;Infección pulmonar causada por bacterias que inflaman los alvéolos;[fiebre_alta,tos_con_flema,dificultad_respiratoria,dolor_toracico,escalofrios];[ibuprofeno_sin_supervision,aspirina_en_ninos];[respiratorio,infeccioso,agudo]
+hepatitis_a;Infección viral del hígado transmitida por agua o alimentos contaminados;[ictericia,fatiga,nauseas,dolor_abdominal,fiebre,orina_oscura];[paracetamol_excesivo,alcohol,medicamentos_hepatotoxicos];[digestivo,viral,agudo,infeccioso]
+hipertiroidismo;Producción excesiva de hormonas tiroideas que acelera el metabolismo;[perdida_de_peso,taquicardia,temblores,sudoracion_excesiva,nerviosismo,insomnio];[estimulantes,cafeina_excesiva,yodo_sin_supervision];[endocrino,cronico]

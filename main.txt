@@ -21,8 +21,9 @@ Pacientes:
     en el cálculo de la afinidad con las enfermedades registradas.
     Una vez completado el ingreso de datos, el usuario podrá solicitar un análisis. El sistema,
     utilizando la base de conocimiento en prolog, realizará un proceso de inferencia lógica para
-    determinar posibles enfermedades asociadas a los síntomas proporcionados. Estas
-    enfermedades deberán ordenarse por porcentaje de coincidencia, expresado como nivel de
+    determinar posibles enfermedades asociadas a los síntomas proporcionados. 
+    
+    Estas enfermedades deberán ordenarse por porcentaje de coincidencia, expresado como nivel de
     afinidad entre el perfil del paciente y las características clínicas de cada enfermedad.
     Además del diagnóstico, el sistema debe sugerir medicamentos adecuados para tratar cada
     una de las enfermedades listadas, siempre y cuando no estén contraindicados por las

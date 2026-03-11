@@ -58,11 +58,11 @@ class PatientView(tk.Frame):
         self._hist_lbl.pack(pady=(16, 0))
 
         tk.Frame(sb, bg=COLORS["bg_card"]).pack(expand=True)
-        _btn(sb, "⚙  Panel Admin",
+        _btn(sb, "⚙ Panel Admin",
              lambda: self.controller.show_frame(
                  __import__("ui.login_view").login_view.LoginView),
              secondary=True).pack(pady=(0, 10), padx=20, fill="x")
-        _btn(sb, "🏠  Inicio",
+        _btn(sb, "Inicio",
              lambda: self.controller.show_frame(
                  __import__("ui.home_view").home_view.HomeView),
              secondary=True).pack(pady=(0, 24), padx=20, fill="x")
