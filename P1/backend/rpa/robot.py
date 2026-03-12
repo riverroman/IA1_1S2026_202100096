@@ -1,19 +1,3 @@
-"""
-robot.py — RPA MediLogic
-Script INDEPENDIENTE que usa PyAutoGUI para llenar automáticamente
-el formulario de enfermedades en la app MediLogic.
-
-CÓMO USAR:
-    1. Corre la app:  python app.py
-    2. Inicia sesión como Admin → ve a pestaña "Enfermedades"
-    3. En otra terminal: python rpa/robot.py
-    4. Sigue las instrucciones en pantalla
-
-REQUISITOS:
-    pip install pyautogui pyperclip
-    En macOS: pip install pyobjc-core pyobjc  (para permisos de accesibilidad)
-"""
-
 import sys
 import os
 import time
@@ -41,9 +25,7 @@ RUTA_TXT_DEFAULT = os.path.join(os.path.dirname(__file__), "..", "ArchivoRPA.txt
 def _es_mac():
     return sys.platform == "darwin"
 
-
 def _pegar_texto(texto):
-    """Escribe texto usando clipboard — maneja tildes y caracteres especiales."""
     if _es_mac():
         proc = subprocess.Popen(["pbcopy"], stdin=subprocess.PIPE)
         proc.communicate(texto.encode("utf-8"))

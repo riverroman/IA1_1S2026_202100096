@@ -227,3 +227,45 @@ clasificacion(hipertiroidismo,cronico).
 
 % TRATAMIENTOS — trata(Medicamento, Enfermedad)
 trata(paracetamol,hepatitis_a).
+
+% === RPA Carga automática — 2026-03-12 14:39:35 ===
+enfermedad(neumonia_bacteriana).
+descripcion(neumonia_bacteriana,'Infección pulmonar causada por bacterias que inflaman los alvéolos').
+sintoma(neumonia_bacteriana,fiebre_alta).
+sintoma(neumonia_bacteriana,tos_con_flema).
+sintoma(neumonia_bacteriana,dificultad_respiratoria).
+sintoma(neumonia_bacteriana,dolor_toracico).
+sintoma(neumonia_bacteriana,escalofrios).
+contraindicado(neumonia_bacteriana,ibuprofeno_sin_supervision).
+contraindicado(neumonia_bacteriana,aspirina_en_ninos).
+clasificacion(neumonia_bacteriana,respiratorio).
+clasificacion(neumonia_bacteriana,infeccioso).
+clasificacion(neumonia_bacteriana,agudo).
+enfermedad(hepatitis_a).
+descripcion(hepatitis_a,'Infección viral del hígado transmitida por agua o alimentos contaminados').
+sintoma(hepatitis_a,ictericia).
+sintoma(hepatitis_a,fatiga).
+sintoma(hepatitis_a,nauseas).
+sintoma(hepatitis_a,dolor_abdominal).
+sintoma(hepatitis_a,fiebre).
+sintoma(hepatitis_a,orina_oscura).
+contraindicado(hepatitis_a,paracetamol_excesivo).
+contraindicado(hepatitis_a,alcohol).
+contraindicado(hepatitis_a,medicamentos_hepatotoxicos).
+clasificacion(hepatitis_a,digestivo).
+clasificacion(hepatitis_a,viral).
+clasificacion(hepatitis_a,agudo).
+clasificacion(hepatitis_a,infeccioso).
+enfermedad(hipertiroidismo).
+descripcion(hipertiroidismo,'Producción excesiva de hormonas tiroideas que acelera el metabolismo').
+sintoma(hipertiroidismo,perdida_de_peso).
+sintoma(hipertiroidismo,taquicardia).
+sintoma(hipertiroidismo,temblores).
+sintoma(hipertiroidismo,sudoracion_excesiva).
+sintoma(hipertiroidismo,nerviosismo).
+sintoma(hipertiroidismo,insomnio).
+contraindicado(hipertiroidismo,estimulantes).
+contraindicado(hipertiroidismo,cafeina_excesiva).
+contraindicado(hipertiroidismo,yodo_sin_supervision).
+clasificacion(hipertiroidismo,endocrino).
+clasificacion(hipertiroidismo,cronico).
