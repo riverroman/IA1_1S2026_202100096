@@ -264,9 +264,18 @@ class PatientView(tk.Frame):
             ).grid(row=i // 3, column=i % 3, sticky="w", padx=10, pady=3)
 
     def recargar_sintomas(self):
-        """Recarga síntomas y crónicas desde Prolog (útil tras cargar RPA)."""
+        """
+        Refresca checkboxes desde la memoria Prolog compartida (singleton).
+        NO llama reload() — eso pisaría los assertz del Admin que aún
+        no fueron persistidos al .pl.
+        """
         self._cargar_sintomas()
         self._cargar_cronicas()
+
+        if self._canvas_ref:
+            self._canvas_ref.update_idletasks()
+            self._canvas_ref.configure(
+                scrollregion=self._canvas_ref.bbox("all"))
 
     # ══════════════════════════════════════════════════════════════════
     # HELPERS UI

@@ -1,10 +1,21 @@
 from pyswip import Prolog
 from config import PROLOG_FILE
 
+_instancia_global = None
 
 class PrologService:
 
+    def __new__(cls, *args, **kwargs):
+        global _instancia_global
+        if _instancia_global is None:
+            _instancia_global = super().__new__(cls)
+            _instancia_global._inicializado = False
+        return _instancia_global
+
     def __init__(self):
+        if self._inicializado:
+            return 
+        self._inicializado = True
         self.prolog = Prolog()
         self.prolog.consult(PROLOG_FILE)
 
@@ -33,10 +44,6 @@ class PrologService:
         return [r["E"] for r in resultados]
 
     def obtener_enfermedades_cronicas(self):
-        """
-        Devuelve enfermedades marcadas como crónicas en el .pl.
-        clasificacion(E, cronico) — cargado dinámicamente por el RPA.
-        """
         resultados = self.query("clasificacion(E, cronico)")
         vistos = set()
         cronicas = []
@@ -48,7 +55,6 @@ class PrologService:
         return sorted(cronicas)
 
     def obtener_todos_sintomas(self):
-        """Síntomas únicos cargados en el .pl."""
         resultados = self.query("sintoma(_, S)")
         vistos = set()
         unicos = []
@@ -102,7 +108,6 @@ class PrologService:
     # ── Medicamentos ──────────────────────────────────────────────────
 
     def medicamentos_seguros(self, enfermedad):
-        """Lista medicamentos seguros para una enfermedad desde trata/2."""
         resultados = self.query(f"todos_medicamentos_seguros({enfermedad}, Lista)")
         return resultados[0]["Lista"] if resultados else []
 
@@ -110,7 +115,6 @@ class PrologService:
         return bool(self.query(f"medicamento_seguro({enfermedad}, {medicamento})"))
 
     def obtener_todos_medicamentos(self):
-        """Medicamentos registrados con trata/2."""
         resultados = self.query("trata(M, _)")
         vistos = set()
         meds = []
@@ -124,7 +128,6 @@ class PrologService:
     # ── assertz / retract (para Admin) ───────────────────────────────
 
     def agregar_trata(self, medicamento, enfermedad):
-        """Admin: asocia medicamento a enfermedad en tiempo real."""
         self.prolog.assertz(f"trata({medicamento}, {enfermedad})")
 
     def eliminar_trata(self, medicamento, enfermedad):
@@ -135,7 +138,6 @@ class PrologService:
 
     def agregar_enfermedad(self, nombre, descripcion, sintomas,
                             contraindicados, clasificaciones):
-        """Admin: agrega enfermedad completa en tiempo real."""
         self.prolog.assertz(f"enfermedad({nombre})")
         self.prolog.assertz(f"descripcion({nombre}, '{descripcion}')")
         for s in sintomas:
@@ -146,7 +148,6 @@ class PrologService:
             self.prolog.assertz(f"clasificacion({nombre}, {cl})")
 
     def eliminar_enfermedad(self, nombre):
-        """Admin: elimina enfermedad y todos sus hechos."""
         try: self.prolog.retract(f"enfermedad({nombre})")
         except Exception: pass
         for hecho in ["descripcion", "sintoma", "contraindicado",
@@ -171,7 +172,7 @@ class PrologService:
         lista = self._lista_prolog(sintomas)
         resultados = self.query(f"explicacion({enfermedad}, {lista}, Coinciden)")
         return resultados[0]["Coinciden"] if resultados else []
-    
+
     def obtener_sintomas_ausentes(self, enfermedad, sintomas):
         lista = self._lista_prolog(sintomas)
         resultados = self.query(f"sintomas_ausentes({enfermedad}, {lista}, Ausentes)")

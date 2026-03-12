@@ -41,15 +41,16 @@ class AdminView(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent, bg=COLORS["bg_dark"])
         self.controller = controller
-        # Importar servicio Prolog directamente
         from services.prolog_service import PrologService
         self.prolog = PrologService()
-        self._tab_actual = tk.StringVar(value="enfermedades")
+        self._tab_actual    = tk.StringVar(value="enfermedades")
+        # Estado de edición
+        self._modo_edicion  = False
+        self._enf_editando  = None
         self.build_ui()
 
     # ══════════════════════════════════════════════════════════════════
     def build_ui(self):
-        # ── Sidebar ───────────────────────────────────────────────────
         sb = tk.Frame(self, bg=COLORS["bg_card"], width=220)
         sb.pack(side="left", fill="y")
         sb.pack_propagate(False)
@@ -65,9 +66,8 @@ class AdminView(tk.Frame):
                  bg=COLORS["bg_card"], fg=COLORS["accent"]).pack(pady=(0, 20))
         tk.Frame(sb, bg=COLORS["border"], height=1).pack(fill="x", padx=20)
 
-        # Menú de pestañas
         tabs = [
-            ("Enfermedades",  "enfermedades"),
+            ("Enfermedades", "enfermedades"),
             ("Medicamentos",  "medicamentos"),
             ("Archivo .pl",   "archivo"),
         ]
@@ -94,11 +94,9 @@ class AdminView(tk.Frame):
                  __import__("ui.login_view").login_view.LoginView),
              secondary=True).pack(pady=(0, 24), padx=16, fill="x")
 
-        # ── Área de contenido ─────────────────────────────────────────
         self._content = tk.Frame(self, bg=COLORS["bg_dark"])
         self._content.pack(side="left", fill="both", expand=True)
 
-        # Construir todas las pestañas (ocultas inicialmente)
         self._tabs = {}
         self._tabs["enfermedades"] = self._build_tab_enfermedades()
         self._tabs["medicamentos"] = self._build_tab_medicamentos()
@@ -117,7 +115,6 @@ class AdminView(tk.Frame):
                 bg=COLORS["bg_input"] if activo else COLORS["bg_card"],
                 fg=COLORS["accent"] if activo else COLORS["text_secondary"],
             )
-        # Refrescar datos al cambiar pestaña
         if key == "enfermedades":
             self._refrescar_lista_enfermedades()
         elif key == "medicamentos":
@@ -130,7 +127,6 @@ class AdminView(tk.Frame):
     def _build_tab_enfermedades(self):
         frame = tk.Frame(self._content, bg=COLORS["bg_dark"])
 
-        # Scrollable wrapper
         canvas = tk.Canvas(frame, bg=COLORS["bg_dark"], highlightthickness=0)
         vsb = tk.Scrollbar(frame, orient="vertical", command=canvas.yview)
         canvas.configure(yscrollcommand=vsb.set)
@@ -145,7 +141,6 @@ class AdminView(tk.Frame):
 
         PX = 40
 
-        # Header
         hdr = tk.Frame(inner, bg=COLORS["bg_dark"])
         hdr.pack(fill="x", padx=PX, pady=(36, 0))
         tk.Label(hdr, text="Gestión de Enfermedades", font=FONTS["title"],
@@ -155,11 +150,16 @@ class AdminView(tk.Frame):
                  fg=COLORS["text_secondary"]).pack(anchor="w", pady=(4, 0))
         tk.Frame(hdr, bg=COLORS["accent"], height=2, width=60).pack(anchor="w", pady=(10, 0))
 
-        # ── Formulario crear/editar ───────────────────────────────────
+        # ── Formulario ────────────────────────────────────────────────
         form = tk.Frame(inner, bg=COLORS["bg_card"], padx=32, pady=24)
         form.pack(fill="x", padx=PX, pady=(20, 0))
-        tk.Label(form, text="NUEVA ENFERMEDAD", font=("Helvetica", 9, "bold"),
-                 bg=COLORS["bg_card"], fg=COLORS["accent"]).pack(anchor="w", pady=(0, 14))
+
+        # ★ Label con referencia (cambia entre "NUEVA ENFERMEDAD" y "EDITANDO: X")
+        self._form_titulo_lbl = tk.Label(
+            form, text="NUEVA ENFERMEDAD",
+            font=("Helvetica", 9, "bold"),
+            bg=COLORS["bg_card"], fg=COLORS["accent"])
+        self._form_titulo_lbl.pack(anchor="w", pady=(0, 14))
 
         # Fila 1: nombre + descripción
         r1 = tk.Frame(form, bg=COLORS["bg_card"])
@@ -211,12 +211,23 @@ class AdminView(tk.Frame):
         self._enf_clasif = _entry(r3)
         self._enf_clasif.pack(fill="x", ipady=8)
 
-        # Botones formulario
-        bf = tk.Frame(form, bg=COLORS["bg_card"])
-        bf.pack(fill="x")
-        _btn(bf, "✚  Crear Enfermedad", self._crear_enfermedad).pack(side="left")
-        tk.Frame(bf, bg=COLORS["bg_card"], width=10).pack(side="left")
-        _btn(bf, "↺  Limpiar", self._limpiar_form_enf, secondary=True).pack(side="left")
+        # ★ Botones del formulario con referencias
+        self._bf_form = tk.Frame(form, bg=COLORS["bg_card"])
+        self._bf_form.pack(fill="x")
+
+        self._btn_crear = _btn(self._bf_form, "✚  Crear Enfermedad", self._crear_enfermedad)
+        self._btn_crear.pack(side="left")
+
+        tk.Frame(self._bf_form, bg=COLORS["bg_card"], width=10).pack(side="left")
+
+        self._btn_actualizar = _btn(self._bf_form, "✎  Actualizar Enfermedad",
+                                    self._actualizar_enfermedad)
+        # Oculto por defecto — se muestra solo en modo edición
+        # (NO hacer pack aquí, se hace en _cargar_enf_seleccionada)
+
+        tk.Frame(self._bf_form, bg=COLORS["bg_card"], width=10).pack(side="left")
+        _btn(self._bf_form, "↺  Nuevo / Limpiar",
+             self._limpiar_form_enf, secondary=True).pack(side="left")
 
         # ── Lista de enfermedades ─────────────────────────────────────
         tk.Label(inner, text="ENFERMEDADES REGISTRADAS",
@@ -226,7 +237,6 @@ class AdminView(tk.Frame):
         lista_frame = tk.Frame(inner, bg=COLORS["bg_card"])
         lista_frame.pack(fill="x", padx=PX, pady=(0, 40))
 
-        # Treeview
         cols = ("enfermedad", "descripcion", "sintomas", "clasificacion")
         style = ttk.Style()
         style.theme_use("default")
@@ -248,10 +258,10 @@ class AdminView(tk.Frame):
                                        show="headings", style="Med.Treeview",
                                        height=10)
         for col, w, label in [
-            ("enfermedad",   160, "Enfermedad"),
-            ("descripcion",  280, "Descripción"),
-            ("sintomas",     260, "Síntomas"),
-            ("clasificacion",160, "Clasificación"),
+            ("enfermedad",    160, "Enfermedad"),
+            ("descripcion",   280, "Descripción"),
+            ("sintomas",      260, "Síntomas"),
+            ("clasificacion", 160, "Clasificación"),
         ]:
             self._tree_enf.heading(col, text=label)
             self._tree_enf.column(col, width=w, minwidth=80)
@@ -262,16 +272,17 @@ class AdminView(tk.Frame):
         self._tree_enf.pack(side="left", fill="x", expand=True)
         vsb2.pack(side="right", fill="y")
 
-        # Botones de acción sobre la lista
         acc = tk.Frame(inner, bg=COLORS["bg_dark"])
         acc.pack(fill="x", padx=PX, pady=(6, 0))
-        _btn(acc, "Cargar seleccionado al formulario",
+        _btn(acc, "✎  Cargar al formulario para editar",
              self._cargar_enf_seleccionada, secondary=True, small=True).pack(side="left")
         tk.Frame(acc, bg=COLORS["bg_dark"], width=8).pack(side="left")
-        _btn(acc, "Eliminar seleccionado",
+        _btn(acc, "🗑  Eliminar seleccionado",
              self._eliminar_enf_seleccionada, danger=True, small=True).pack(side="left")
 
         return frame
+
+    # ── Métodos pestaña Enfermedades ──────────────────────────────────
 
     def _refrescar_lista_enfermedades(self):
         for row in self._tree_enf.get_children():
@@ -292,14 +303,12 @@ class AdminView(tk.Frame):
         if not nombre:
             messagebox.showwarning("Campo vacío", "El nombre de la enfermedad es requerido.")
             return
-
-        sint  = [s.strip().lower().replace(" ", "_")
-                 for s in self._enf_sintomas.get().split(",") if s.strip()]
+        sint   = [s.strip().lower().replace(" ", "_")
+                  for s in self._enf_sintomas.get().split(",") if s.strip()]
         contra = [c.strip().lower().replace(" ", "_")
                   for c in self._enf_contra.get().split(",") if c.strip()]
         clasif = [cl.strip().lower().replace(" ", "_")
                   for cl in self._enf_clasif.get().split(",") if cl.strip()]
-
         try:
             self.prolog.agregar_enfermedad(nombre, desc, sint, contra, clasif)
             self._persistir_pl()
@@ -312,18 +321,60 @@ class AdminView(tk.Frame):
     def _cargar_enf_seleccionada(self):
         sel = self._tree_enf.selection()
         if not sel:
+            messagebox.showwarning("Sin selección", "Selecciona una enfermedad de la lista.")
             return
         vals = self._tree_enf.item(sel[0], "values")
-        enf = vals[0]
-        sint  = ", ".join(self.prolog.obtener_sintomas_enfermedad(enf))
-        contra= ", ".join(str(c) for c in self.prolog.obtener_contraindicados(enf))
-        clasif= ", ".join(str(c) for c in self.prolog.obtener_clasificaciones(enf))
-        self._limpiar_form_enf()
+        enf  = vals[0]
+        sint   = ", ".join(self.prolog.obtener_sintomas_enfermedad(enf))
+        contra = ", ".join(str(c) for c in self.prolog.obtener_contraindicados(enf))
+        clasif = ", ".join(str(c) for c in self.prolog.obtener_clasificaciones(enf))
+
+        # Limpiar campos SIN tocar el modo (lo vamos a setear justo después)
+        for e in [self._enf_nombre, self._enf_desc,
+                  self._enf_sintomas, self._enf_contra, self._enf_clasif]:
+            e.delete(0, "end")
+
         self._enf_nombre.insert(0, enf)
         self._enf_desc.insert(0, vals[1])
         self._enf_sintomas.insert(0, sint)
         self._enf_contra.insert(0, contra)
         self._enf_clasif.insert(0, clasif)
+
+        # Activar modo edición
+        self._modo_edicion = True
+        self._enf_editando = enf
+        self._form_titulo_lbl.config(
+            text=f"EDITANDO: {enf.upper()}",
+            fg="#f39c12"
+        )
+        self._btn_crear.pack_forget()
+        self._btn_actualizar.pack(side="left", before=self._bf_form.winfo_children()[-1]
+                                   if self._bf_form.winfo_children() else None)
+
+    def _actualizar_enfermedad(self):
+        if not self._enf_editando:
+            return
+        nombre_nuevo = self._enf_nombre.get().strip().lower().replace(" ", "_")
+        desc         = self._enf_desc.get().strip()
+        sint   = [s.strip().lower().replace(" ", "_")
+                  for s in self._enf_sintomas.get().split(",") if s.strip()]
+        contra = [c.strip().lower().replace(" ", "_")
+                  for c in self._enf_contra.get().split(",") if c.strip()]
+        clasif = [cl.strip().lower().replace(" ", "_")
+                  for cl in self._enf_clasif.get().split(",") if cl.strip()]
+        if not nombre_nuevo:
+            messagebox.showwarning("Campo vacío", "El nombre no puede estar vacío.")
+            return
+        try:
+            self.prolog.eliminar_enfermedad(self._enf_editando)
+            self.prolog.agregar_enfermedad(nombre_nuevo, desc, sint, contra, clasif)
+            self._persistir_pl()
+            self._refrescar_lista_enfermedades()
+            self._limpiar_form_enf()
+            messagebox.showinfo("Actualizada",
+                f"Enfermedad '{nombre_nuevo}' actualizada correctamente.")
+        except Exception as ex:
+            messagebox.showerror("Error", str(ex))
 
     def _eliminar_enf_seleccionada(self):
         sel = self._tree_enf.selection()
@@ -345,6 +396,12 @@ class AdminView(tk.Frame):
         for e in [self._enf_nombre, self._enf_desc,
                   self._enf_sintomas, self._enf_contra, self._enf_clasif]:
             e.delete(0, "end")
+        # Volver a modo creación
+        self._modo_edicion = False
+        self._enf_editando = None
+        self._form_titulo_lbl.config(text="NUEVA ENFERMEDAD", fg=COLORS["accent"])
+        self._btn_actualizar.pack_forget()
+        self._btn_crear.pack(side="left")
 
     # ══════════════════════════════════════════════════════════════════
     # PESTAÑA 2 — MEDICAMENTOS
@@ -374,7 +431,6 @@ class AdminView(tk.Frame):
                  fg=COLORS["text_secondary"]).pack(anchor="w", pady=(4, 0))
         tk.Frame(hdr, bg=COLORS["accent"], height=2, width=60).pack(anchor="w", pady=(10, 0))
 
-        # ── Formulario nuevo medicamento ──────────────────────────────
         form = tk.Frame(inner, bg=COLORS["bg_card"], padx=32, pady=24)
         form.pack(fill="x", padx=PX, pady=(20, 0))
         tk.Label(form, text="ASOCIAR MEDICAMENTO A ENFERMEDAD",
@@ -384,7 +440,6 @@ class AdminView(tk.Frame):
         r1 = tk.Frame(form, bg=COLORS["bg_card"])
         r1.pack(fill="x", pady=(0, 12))
 
-        # Nombre del medicamento
         c1 = tk.Frame(r1, bg=COLORS["bg_card"])
         c1.pack(side="left", fill="x", expand=True, padx=(0, 12))
         tk.Label(c1, text="Nombre del medicamento",
@@ -396,7 +451,6 @@ class AdminView(tk.Frame):
                  font=FONTS["body_sm"], bg=COLORS["bg_card"],
                  fg=COLORS["text_muted"]).pack(anchor="w", pady=(2, 0))
 
-        # Enfermedad (combo dinámico)
         c2 = tk.Frame(r1, bg=COLORS["bg_card"])
         c2.pack(side="left", fill="x", expand=True)
         tk.Label(c2, text="Enfermedad que trata",
@@ -408,7 +462,6 @@ class AdminView(tk.Frame):
             font=FONTS["body_sm"], state="readonly")
         self._med_enf_combo.pack(fill="x", ipady=6)
 
-        # Botones
         bf = tk.Frame(form, bg=COLORS["bg_card"])
         bf.pack(fill="x", pady=(16, 0))
         _btn(bf, "✚  Asociar Medicamento", self._crear_medicamento).pack(side="left")
@@ -416,11 +469,8 @@ class AdminView(tk.Frame):
         _btn(bf, "⟳  Recargar enfermedades",
              self._refrescar_combo_enf_med, secondary=True, small=True).pack(side="left")
 
-        # Separador
-        tk.Frame(inner, bg=COLORS["border"], height=1).pack(
-            fill="x", padx=PX, pady=(24, 0))
+        tk.Frame(inner, bg=COLORS["border"], height=1).pack(fill="x", padx=PX, pady=(24, 0))
 
-        # ── Tabla medicamentos actuales ───────────────────────────────
         tk.Label(inner, text="MEDICAMENTOS REGISTRADOS (trata/2)",
                  font=("Helvetica", 9, "bold"), bg=COLORS["bg_dark"],
                  fg=COLORS["text_muted"]).pack(anchor="w", padx=PX, pady=(16, 6))
@@ -464,8 +514,7 @@ class AdminView(tk.Frame):
         try:
             resultados = self.prolog.query("trata(M, E)")
             for r in resultados:
-                self._tree_med.insert("", "end",
-                    values=(str(r["M"]), str(r["E"])))
+                self._tree_med.insert("", "end", values=(str(r["M"]), str(r["E"])))
         except Exception as ex:
             print(f"[admin] error refrescar meds: {ex}")
 
@@ -493,8 +542,7 @@ class AdminView(tk.Frame):
             return
         vals = self._tree_med.item(sel[0], "values")
         med, enf = vals[0], vals[1]
-        if not messagebox.askyesno("Confirmar",
-                f"¿Eliminar trata({med}, {enf})?"):
+        if not messagebox.askyesno("Confirmar", f"¿Eliminar trata({med}, {enf})?"):
             return
         try:
             self.prolog.eliminar_trata(med, enf)
@@ -519,31 +567,25 @@ class AdminView(tk.Frame):
                  fg=COLORS["text_secondary"]).pack(anchor="w", pady=(4, 0))
         tk.Frame(hdr, bg=COLORS["accent"], height=2, width=60).pack(anchor="w", pady=(10, 0))
 
-        # Botones de acción
         acc = tk.Frame(frame, bg=COLORS["bg_dark"])
         acc.pack(fill="x", padx=PX, pady=(20, 10))
-        _btn(acc, "Ver .pl actual",  self._ver_pl_actual).pack(side="left")
+        _btn(acc, "Ver .pl actual",   self._ver_pl_actual).pack(side="left")
         tk.Frame(acc, bg=COLORS["bg_dark"], width=10).pack(side="left")
-        _btn(acc, "Exportar .pl",    self._exportar_pl,  secondary=True).pack(side="left")
+        _btn(acc, "Exportar .pl",     self._exportar_pl,  secondary=True).pack(side="left")
         tk.Frame(acc, bg=COLORS["bg_dark"], width=10).pack(side="left")
-        _btn(acc, "Cargar nuevo .pl", self._cargar_pl,   secondary=True).pack(side="left")
-        
-        # Visor de texto
+        _btn(acc, "Cargar nuevo .pl", self._cargar_pl,    secondary=True).pack(side="left")
+
         viewer_frame = tk.Frame(frame, bg=COLORS["bg_card"])
         viewer_frame.pack(fill="both", expand=True, padx=PX, pady=(0, 40))
 
         self._pl_text = tk.Text(
             viewer_frame, bg=COLORS["bg_input"], fg=COLORS["text_primary"],
             font=("Courier", 10), relief="flat", padx=16, pady=16,
-            insertbackground=COLORS["accent"], state="disabled",
-            wrap="none"
-        )
-        hsb = tk.Scrollbar(viewer_frame, orient="horizontal",
-                           command=self._pl_text.xview)
-        vsb = tk.Scrollbar(viewer_frame, orient="vertical",
-                           command=self._pl_text.yview)
+            insertbackground=COLORS["accent"], state="disabled", wrap="none")
+        hsb = tk.Scrollbar(viewer_frame, orient="horizontal", command=self._pl_text.xview)
+        vsb = tk.Scrollbar(viewer_frame, orient="vertical",   command=self._pl_text.yview)
         self._pl_text.configure(xscrollcommand=hsb.set, yscrollcommand=vsb.set)
-        vsb.pack(side="right", fill="y")
+        vsb.pack(side="right",  fill="y")
         hsb.pack(side="bottom", fill="x")
         self._pl_text.pack(fill="both", expand=True)
 
@@ -567,8 +609,7 @@ class AdminView(tk.Frame):
             defaultextension=".pl",
             filetypes=[("Prolog files", "*.pl"), ("All files", "*.*")],
             initialfile="knowledge_base_export.pl",
-            title="Exportar archivo .pl"
-        )
+            title="Exportar archivo .pl")
         if not destino:
             return
         try:
@@ -583,8 +624,7 @@ class AdminView(tk.Frame):
     def _cargar_pl(self):
         origen = filedialog.askopenfilename(
             filetypes=[("Prolog files", "*.pl"), ("All files", "*.*")],
-            title="Cargar archivo .pl"
-        )
+            title="Cargar archivo .pl")
         if not origen:
             return
         if not messagebox.askyesno("Confirmar",
@@ -596,44 +636,33 @@ class AdminView(tk.Frame):
         try:
             shutil.copy2(origen, PROLOG_FILE)
             self.prolog.reload()
-            messagebox.showinfo("Cargado",
-                "Archivo .pl reemplazado y motor Prolog recargado.")
+            messagebox.showinfo("Cargado", "Archivo .pl reemplazado y motor Prolog recargado.")
         except Exception as ex:
             messagebox.showerror("Error", str(ex))
 
     # ══════════════════════════════════════════════════════════════════
-    # PERSISTENCIA — Guarda el estado actual de Prolog al .pl
+    # PERSISTENCIA
     # ══════════════════════════════════════════════════════════════════
     def _persistir_pl(self):
-        """
-        Regenera el archivo .pl con los hechos actuales en memoria Prolog.
-        Mantiene las reglas intactas y reescribe los hechos al final.
-        """
         from config import PROLOG_FILE
-
         try:
-            # Leer sección de REGLAS (todo antes de '% ENFERMEDADES Y HECHOS' o hasta el final de reglas)
             with open(PROLOG_FILE, "r", encoding="utf-8") as f:
                 contenido_original = f.read()
 
-            # Separar reglas de hechos — buscar marcador
-            marcador = "% ==================================\n% ENFERMEDADES Y HECHOS"
+            marcador  = "% ==================================\n% ENFERMEDADES Y HECHOS"
             marcador2 = "% ==================================\n% TRATAMIENTOS"
             if marcador in contenido_original:
                 reglas_parte = contenido_original[:contenido_original.index(marcador)]
             elif marcador2 in contenido_original:
                 reglas_parte = contenido_original[:contenido_original.index(marcador2)]
             else:
-                # Si no hay marcador, mantener todo como reglas
                 reglas_parte = contenido_original
 
-            # Generar hechos actuales desde Prolog en memoria
             lineas = [
                 "\n% ==================================",
                 "% ENFERMEDADES Y HECHOS — Generado automáticamente",
                 "% ==================================\n",
             ]
-
             enfs = self.prolog.obtener_todas_enfermedades()
             for e in enfs:
                 lineas.append(f"enfermedad({e}).")
@@ -650,14 +679,11 @@ class AdminView(tk.Frame):
 
             lineas.append("")
             lineas.append("% TRATAMIENTOS — trata(Medicamento, Enfermedad)")
-            resultados_trata = self.prolog.query("trata(M, E)")
-            for r in resultados_trata:
+            for r in self.prolog.query("trata(M, E)"):
                 lineas.append(f"trata({r['M']},{r['E']}).")
 
-            nuevo_contenido = reglas_parte + "\n".join(lineas) + "\n"
-
             with open(PROLOG_FILE, "w", encoding="utf-8") as f:
-                f.write(nuevo_contenido)
+                f.write(reglas_parte + "\n".join(lineas) + "\n")
 
         except Exception as ex:
             print(f"[admin] error persistir .pl: {ex}")
