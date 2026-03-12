@@ -274,10 +274,10 @@ class AdminView(tk.Frame):
 
         acc = tk.Frame(inner, bg=COLORS["bg_dark"])
         acc.pack(fill="x", padx=PX, pady=(6, 0))
-        _btn(acc, "✎  Cargar al formulario para editar",
+        _btn(acc, "Cargar al formulario para editar",
              self._cargar_enf_seleccionada, secondary=True, small=True).pack(side="left")
         tk.Frame(acc, bg=COLORS["bg_dark"], width=8).pack(side="left")
-        _btn(acc, "🗑  Eliminar seleccionado",
+        _btn(acc, "Eliminar seleccionado",
              self._eliminar_enf_seleccionada, danger=True, small=True).pack(side="left")
 
         return frame
@@ -494,7 +494,7 @@ class AdminView(tk.Frame):
 
         acc = tk.Frame(inner, bg=COLORS["bg_dark"])
         acc.pack(fill="x", padx=PX, pady=(8, 40))
-        _btn(acc, "🗑  Eliminar asociación seleccionada",
+        _btn(acc, "Eliminar asociación seleccionada",
              self._eliminar_med_seleccionado, danger=True, small=True).pack(side="left")
 
         return frame
